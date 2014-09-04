@@ -1,9 +1,17 @@
-Vagrant setup of 
+Vagrant setup with CKAN 2.2 installed.
 
-## ## Requirements
+## Requirements
 
 - Vagrant >= 1.2
 - Virtualbox
+
+## Virtualbox startup
+
+    vagrant up
+
+Add the Vagrant box's IP address to your hosts file:
+
+    172.94.43.196   ckan.lo
 
 ## Digitalocean
 
@@ -15,10 +23,9 @@ Vagrant setup of
 ### Setup the Digitalocean keys
 
 Copy `digitalocean.json.dist` to `digitalocean.json` and add the client id and the API key
+Uncomment the relevant lines in the Vagrantfile.
 
 ### Fire it up
-
-Uncomment the relevant lines in the Vagrant file.
 
     vagrant up --provider=digital_ocean
 
