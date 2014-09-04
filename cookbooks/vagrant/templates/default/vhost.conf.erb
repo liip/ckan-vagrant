@@ -1,0 +1,25 @@
+# Override the Apache User (vhosts are included at the end of apache2.conf)
+User vagrant
+Group vagrant
+
+WSGISocketPrefix /var/run/wsgi
+<VirtualHost *:80>
+
+    ServerName <%= node[:host_name]  %>
+    UseCanonicalName Off
+    
+    WSGIScriptAlias / /etc/ckan/default/apache.wsgi
+
+    # pass authorization info on (needed for rest api)
+    WSGIPassAuthorization On
+
+    # Deploy as a daemon (avoids conflicts between CKAN instances)
+    WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15
+
+    WSGIProcessGroup ckan_default
+
+    ErrorLog /var/log/apache2/ckan_default.error.log
+    CustomLog /var/log/apache2/ckan_default.custom.log combined
+
+</VirtualHost>
+

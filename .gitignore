@@ -1,0 +1,5 @@
+.vagrant*
+ckan.zip
+ckanext*
+.DS_Store
+digitalocean.json
