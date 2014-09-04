@@ -1,4 +1,4 @@
-Vagrant setup of locale instance of the Swiss Federal Archive (SFA)
+Vagrant setup of 
 
 ## ## Requirements
 
@@ -17,6 +17,8 @@ Vagrant setup of locale instance of the Swiss Federal Archive (SFA)
 Copy `digitalocean.json.dist` to `digitalocean.json` and add the client id and the API key
 
 ### Fire it up
+
+Uncomment the relevant lines in the Vagrant file.
 
     vagrant up --provider=digital_ocean
 

@@ -43,6 +43,8 @@ Vagrant.configure("2") do |config|
     chef(config, "virtualbox", host_name)
   end
 
+# To configure a digital ocean provider, uncomment the following
+=begin
   config.vm.provider :digital_ocean do |provider, config|
     Vagrant.require_plugin('vagrant-digitalocean')
     Vagrant.require_plugin('vagrant-omnibus')
@@ -63,4 +65,5 @@ Vagrant.configure("2") do |config|
 
     chef(config, "digitalocean", digitalocean_host_name)
   end
+=end
 end
