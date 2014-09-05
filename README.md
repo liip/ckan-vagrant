@@ -21,7 +21,7 @@ Add the Vagrant box's IP address to your hosts file:
 
 Vagrant supports Docker natively from Version 1.6 on.
 
-You have to add permissions for the vagrant (uid 1000) user to the shared folder `ckan-vagrant`:
+You have to add permissions for the vagrant user (uid 1000) to the shared folder `ckan-vagrant`:
 
     setfacl -R -m u:1000:rwX .
 
@@ -33,7 +33,7 @@ To find out the IP Address of the box, use the container name that Vagrant print
 
     docker inspect --format '{{ .NetworkSettings.IPAddress }}' ckan-vagrant_default_1409916413
 
-See [Switching providers](#switching-providers) if work with different providers.
+See [Switching providers](#switching-providers) if you work with different providers.
 
 ## Digitalocean
 
