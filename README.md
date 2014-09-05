@@ -1,4 +1,4 @@
-# Vagrant based CKAN development environment
+# Vagrant CKAN development environment
 
 CKAN Version: 2.2
 
@@ -33,7 +33,7 @@ To find out the IP Address of the box, use the container name that Vagrant print
 
     docker inspect --format '{{ .NetworkSettings.IPAddress }}' ckan-vagrant_default_1409916413
 
-See [Switching providers](## Switching providers) if work with different providers.
+See [Switching providers](#switching-providers) if work with different providers.
 
 ## Digitalocean
 
