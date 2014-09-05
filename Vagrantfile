@@ -43,6 +43,13 @@ Vagrant.configure("2") do |config|
     chef(config, "virtualbox", host_name)
   end
 
+  config.vm.provider :docker do |provider, config|
+    provider.image = "waldvogel/vagrant-chef-puppet:ubuntu-12.04"
+    provider.has_ssh = true
+    provider.privileged = true
+    chef(config, "docker", host_name)
+  end
+
 # To configure a digital ocean provider, uncomment the following
 =begin
   config.vm.provider :digital_ocean do |provider, config|
