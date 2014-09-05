@@ -1,17 +1,39 @@
-Vagrant setup with CKAN 2.2 installed.
+# Vagrant CKAN development environment
+
+CKAN Version: 2.2
 
 ## Requirements
 
-- Vagrant >= 1.2
+- Vagrant >= 1.6
 - Virtualbox
 
-## Virtualbox startup
+## Virtualbox
 
     vagrant up
 
 Add the Vagrant box's IP address to your hosts file:
 
     172.94.43.196   ckan.lo
+
+## Docker
+
+- [Docker](https://docker.com/) must be installed and working - **it only works on Linux hosts**
+
+Vagrant supports Docker natively from Version 1.6 on.
+
+You have to add permissions for the vagrant user (uid 1000) to the shared folder `ckan-vagrant`:
+
+    setfacl -R -m u:1000:rwX .
+
+Then you can bring the box up:
+
+    vagrant up --provider=docker
+
+To find out the IP Address of the box, use the container name that Vagrant prints out (in my case `ckan-vagrant_default_1409916413`) with `docker inspect`:
+
+    docker inspect --format '{{ .NetworkSettings.IPAddress }}' ckan-vagrant_default_1409916413
+
+See [Switching providers](#switching-providers) if you work with different providers.
 
 ## Digitalocean
 
