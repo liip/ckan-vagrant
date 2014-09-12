@@ -269,6 +269,8 @@ bash "Install the harvest extension" do
   code <<-EOH
   source #{HOME}/pyenv/bin/activate
   pip install -e git+https://github.com/okfn/ckanext-harvest.git@stable#egg=ckanext-harvest --src #{VAGRANT_DIR}
+  cd #{VAGRANT_DIR}/ckan-harvest
+  python setup.py develop
   EOH
 end
 
