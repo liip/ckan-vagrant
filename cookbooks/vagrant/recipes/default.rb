@@ -118,6 +118,17 @@ dest = "/etc/solr/conf/"
   end
 end
 
+bash "make sure postgres is using UTF-8" do
+  user "root"
+  not_if "sudo -u postgres psql -c '\\l' | grep UTF8"
+  code <<-EOH
+service apache2 stop
+pg_dropcluster --stop 9.1 main
+pg_createcluster --start -e UTF-8 9.1 main
+service apache2 start
+EOH
+end
+
 bash "disable the apache default" do
   user "root"
   group "root"
