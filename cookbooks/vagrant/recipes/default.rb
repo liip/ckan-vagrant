@@ -125,16 +125,13 @@ bash "make sure postgres is using UTF-8" do
 service apache2 stop
 pg_dropcluster --stop 9.1 main
 pg_createcluster --start -e UTF-8 9.1 main
-service apache2 start
 EOH
+  notifies :restart, "service[apache2]"
 end
 
-bash "disable the apache default" do
-  user "root"
-  group "root"
-  code <<-EOH
-a2dissite default
-EOH
+execute "disable the apache default" do
+  command "a2dissite default"
+  notifies :reload, "service[apache2]"
 end
 
 # copy the development.ini
@@ -161,12 +158,10 @@ pip install -r #{CKAN_DIR}/requirements.txt
 EOH
 end
 
-bash "enable vhost.conf within apache" do
+execute "enable vhost.conf within apache" do
   not_if "stat /etc/apache2/sites-enabled/vhost.conf"
-  notifies :restart, "service[apache2]"
-  code <<-EOH
-a2ensite vhost.conf
-EOH
+  notifies :reload, "service[apache2]"
+  command "a2ensite vhost.conf"
 end
 
 template "/etc/apache2/ports.conf" do
@@ -177,12 +172,9 @@ template "/etc/apache2/ports.conf" do
   notifies :restart, "service[apache2]"
 end
 
-bash "create etc/ckan/default folder" do
-  user "root"
-  group "root"
-  code <<-EOH
-mkdir -p /etc/ckan/default
-EOH
+execute "create etc/ckan/default folder" do
+  not_if "stat /etc/ckan/default"
+  command "mkdir -p /etc/ckan/default"
 end
 
 template "/etc/ckan/default/apache.wsgi" do
@@ -215,11 +207,9 @@ template "/etc/cron.daily/remove_old_sessions" do
   source "remove_old_sessions.cronjob"
 end
 
-bash "make sure /home/vagrant/bin exists" do
+execute "make sure /home/vagrant/bin exists" do
   user "vagrant"
-  code <<-EOH
-mkdir -p /home/vagrant/bin
-EOH
+  command "mkdir -p /home/vagrant/bin"
 end
 
 template "/home/vagrant/bin/ckan" do
@@ -229,11 +219,9 @@ template "/home/vagrant/bin/ckan" do
   source "bin_ckan"
 end
 
-bash "make sure /home/vagrant/lib exists" do
+execute "make sure /home/vagrant/lib exists" do
   user "vagrant"
-  code <<-EOH
-mkdir -p /home/vagrant/lib
-EOH
+  command "mkdir -p /home/vagrant/lib"
 end
 
 bash "setup postgres db for ckan" do
