@@ -66,10 +66,6 @@ template "/etc/default/jetty" do
   source "jetty"
 end
 
-file "/etc/solr/conf/schema.xml" do
-  action :delete
-end
-
 bash "create virtualenv" do
   user "vagrant"
   not_if "test -f /home/#{USER}/pyenv/bin/activate"
@@ -95,6 +91,11 @@ bash "clone ckan" do
 EOH
 end
 
+service "jetty" do
+  supports :restart => true, :reload => true, :status => true
+  action [ :enable, :start ]
+end
+
 src  = "#{CKAN_DIR}/ckanext/multilingual/solr/"
 dest = "/etc/solr/conf/"
 [
@@ -113,22 +114,8 @@ dest = "/etc/solr/conf/"
 ].each do |file|
   link dest + file do
     to src + file
+    notifies :restart, "service[jetty]"
   end
-end
-
-service "jetty" do
-  action :restart
-end
-
-bash "make sure postgres is using UTF-8" do
-  user "root"
-  not_if "sudo -u postgres psql -c '\\l' | grep en_US.UTF-8"
-  code <<-EOH
-service apache2 stop
-pg_dropcluster --stop 9.1 main
-pg_createcluster --start -e UTF-8 9.1 main
-service apache2 start
-EOH
 end
 
 bash "disable the apache default" do
@@ -164,11 +151,10 @@ EOH
 end
 
 bash "enable vhost.conf within apache" do
-  user "root"
-  group "root"
+  not_if "stat /etc/apache2/sites-enabled/vhost.conf"
+  notifies :restart, "service[apache2]"
   code <<-EOH
 a2ensite vhost.conf
-service apache2 restart
 EOH
 end
 
@@ -269,6 +255,8 @@ bash "Install the harvest extension" do
   code <<-EOH
   source #{HOME}/pyenv/bin/activate
   pip install -e git+https://github.com/okfn/ckanext-harvest.git@stable#egg=ckanext-harvest --src #{VAGRANT_DIR}
+  cd #{VAGRANT_DIR}/ckanext-harvest
+  python setup.py develop
   EOH
 end
 
@@ -290,7 +278,7 @@ end
       cwd VAGRANT_DIR
       code <<-EOH
       source #{HOME}/pyenv/bin/activate
-      pip install -e git+https://github.com/ogdch/#{ckan_ext}.git#egg=#{ckan_ext} --src #{VAGRANT_DIR}
+      pip install -e git+https://github.com/openresearchdata/#{ckan_ext}.git#egg=#{ckan_ext} --src #{VAGRANT_DIR}
       EOH
     end
 
@@ -310,7 +298,9 @@ end
       source #{HOME}/pyenv/bin/activate
       cd #{VAGRANT_DIR}/#{ckan_ext}
       python setup.py develop
-      pip install -r pip-requirements.txt
+      if test -e pip-requirements.txt; then
+          pip install -r pip-requirements.txt
+      fi
       EOH
     end
 end
@@ -329,12 +319,13 @@ end
 
 bash "creating folders necessary for ckan" do
   user "root"
+  not_if "stat #{HOME}/filestore"
   code <<-EOH
 mkdir -p #{HOME}/filestore
 chown vagrant #{HOME}/filestore
 chmod u+rw #{HOME}/filestore
-sudo service apache2 restart
 EOH
+  notifies :restart, "service[apache2]"
 end
 
 bash "creating an admin user" do
