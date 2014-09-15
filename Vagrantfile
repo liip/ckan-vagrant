@@ -1,9 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-vm_ip                  = "172.94.43.197"
-host_name              = "ord.lo"
-digitalocean_host_name = "ord.do"
+vm_ip                  = "172.94.43.196"
+host_name              = "ckan.lo"
+digitalocean_host_name = "ckan.do"
 
 WINDOWS = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/) ? true : false
 vagrant_dir = File.dirname(__FILE__) + "/"
