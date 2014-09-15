@@ -8,6 +8,7 @@ PROVIDER = node[:provider]
 RUN_HARVESTER = false
 
 bash "set default locale to UTF-8" do
+  not_if "locale | grep 'LC_ALL=en_US.UTF-8'"
   code <<-EOH
 update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 dpkg-reconfigure locales
@@ -43,10 +44,6 @@ template "/home/vagrant/.bash_aliases" do
   user "vagrant"
   mode "0644"
   source ".bash_aliases.erb"
-end
-
-file "/etc/apache2/sites-enabled/000-default" do
-  action :delete
 end
 
 template "/etc/apache2/sites-available/vhost.conf" do
@@ -234,14 +231,17 @@ createdb -O ckan_default ckan_default -E utf-8
 EOH
 end
 
+service "rabbitmq-server" do
+  supports :restart => true, :status => true
+  action [ :enable, :start ]
+end
+
 # solely for development
 # open http://sfa.lo:55672/ with guest/guest
-bash "enabling the rabbitmq management console" do
-  user "root"
-  code <<-EOH
-  sudo /usr/lib/rabbitmq/lib/rabbitmq_server-2.7.1/sbin/rabbitmq-plugins enable rabbitmq_management
-  sudo service rabbitmq-server restart
-  EOH
+execute "enabling the rabbitmq management console" do
+  not_if "/usr/lib/rabbitmq/lib/rabbitmq_server-2.7.1/sbin/rabbitmq-plugins -m -E list | grep rabbitmq_management"
+  command "/usr/lib/rabbitmq/lib/rabbitmq_server-2.7.1/sbin/rabbitmq-plugins enable rabbitmq_management"
+  notifies :restart, "service[rabbitmq-server]"
 end
 
 #################################################################
