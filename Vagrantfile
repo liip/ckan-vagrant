@@ -50,8 +50,7 @@ Vagrant.configure("2") do |config|
     chef(config, "docker", host_name)
   end
 
-# To configure a digital ocean provider, uncomment the following
-=begin
+  # To configure a digital ocean provider, uncomment the following
   config.vm.provider :digital_ocean do |provider, config|
     Vagrant.require_plugin('vagrant-digitalocean')
     Vagrant.require_plugin('vagrant-omnibus')
@@ -64,13 +63,11 @@ Vagrant.configure("2") do |config|
     config.omnibus.chef_version = :latest
 
     data = JSON.parse(IO.read(vagrant_dir + 'digitalocean.json'))
-    provider.client_id = data['client_id']
-    provider.api_key = data['api_key']
-    provider.image = 'Ubuntu 12.04 x64'
-    provider.region = 'Amsterdam 2'
-    provider.size = '1GB'
+    provider.token = data['token']
+    provider.image = 'ubuntu-12-04-x64'
+    provider.region = 'ams2'
+    provider.size = '1gb'
 
     chef(config, "digitalocean", digitalocean_host_name)
   end
-=end
 end
