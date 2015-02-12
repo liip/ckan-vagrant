@@ -5,6 +5,7 @@ SOURCE_DIR = "#{HOME}/pyenv/src"
 CKAN_DIR = "#{SOURCE_DIR}/ckan"
 VAGRANT_DIR = "/vagrant"
 PROVIDER = node[:provider]
+RUN_TESTS = false
 RUN_HARVESTER = false
 
 bash "set default locale to UTF-8" do
@@ -231,18 +232,6 @@ createdb -O ckan_default ckan_default -E utf-8
 EOH
 end
 
-execute "setup ckan test db" do
-  user "postgres"
-  not_if "sudo -u postgres psql -c '\\l' | grep ckan_test"
-  command "createdb -O ckan_default ckan_test -E utf-8"
-end
-
-execute "setup datastore test db" do
-  user "postgres"
-  not_if "sudo -u postgres psql -c '\\l' | grep datastore_test"
-  command "createdb -O ckan_default datastore_test -E utf-8"
-end
-
 bash "install the ckan pip dev dependencies" do
   user USER
   code <<-EOH
@@ -251,14 +240,28 @@ pip install -r #{CKAN_DIR}/dev-requirements.txt
 EOH
 end
 
-bash "reset/populate the test db" do
-  not_if "psql -c '\\dt' ckan_test | grep resource_revision", :user => "postgres"
-  user USER
-  cwd CKAN_DIR
-  code <<-EOH
-source #{HOME}/pyenv/bin/activate
-nosetests --ckan --reset-db --with-pylons=test-core.ini ckan
-EOH
+if RUN_TESTS then
+  execute "setup ckan test db" do
+    user "postgres"
+    not_if "sudo -u postgres psql -c '\\l' | grep ckan_test"
+    command "createdb -O ckan_default ckan_test -E utf-8"
+  end
+  
+  execute "setup datastore test db" do
+    user "postgres"
+    not_if "sudo -u postgres psql -c '\\l' | grep datastore_test"
+    command "createdb -O ckan_default datastore_test -E utf-8"
+  end
+  
+  bash "reset/populate the test db" do
+    not_if "psql -c '\\dt' ckan_test | grep resource_revision", :user => "postgres"
+    user USER
+    cwd CKAN_DIR
+    code <<-EOH
+  source #{HOME}/pyenv/bin/activate
+  nosetests --ckan --reset-db --with-pylons=test-core.ini ckan
+  EOH
+  end
 end
 
 service "rabbitmq-server" do
