@@ -51,23 +51,20 @@ Vagrant.configure("2") do |config|
   end
 
   # To configure a digital ocean provider, uncomment the following
-  config.vm.provider :digital_ocean do |provider, config|
-    Vagrant.require_plugin('vagrant-digitalocean')
-    Vagrant.require_plugin('vagrant-omnibus')
-
-    config.ssh.username = 'vagrant'
-    config.ssh.private_key_path = vagrant_dir + 'cookbooks/vagrant/templates/default/vagrant'
-    config.vm.box = 'digital_ocean'
-    config.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
-    config.vm.hostname = digitalocean_host_name
-    config.omnibus.chef_version = :latest
-
-    data = JSON.parse(IO.read(vagrant_dir + 'digitalocean.json'))
-    provider.token = data['token']
-    provider.image = 'ubuntu-12-04-x64'
-    provider.region = 'ams2'
-    provider.size = '1gb'
-
-    chef(config, "digitalocean", digitalocean_host_name)
-  end
+  # config.vm.provider :digital_ocean do |provider, config|
+  #   Vagrant.require_plugin('vagrant-digitalocean')
+  #   Vagrant.require_plugin('vagrant-omnibus')
+  #   config.ssh.username = 'vagrant'
+  #   config.ssh.private_key_path = vagrant_dir + 'cookbooks/vagrant/templates/default/vagrant'
+  #   config.vm.box = 'digital_ocean'
+  #   config.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  #   config.vm.hostname = digitalocean_host_name
+  #   config.omnibus.chef_version = :latest
+  #   data = JSON.parse(IO.read(vagrant_dir + 'digitalocean.json'))
+  #   provider.token = data['token']
+  #   provider.image = 'ubuntu-12-04-x64'
+  #   provider.region = 'ams2'
+  #   provider.size = '1gb'
+  #   chef(config, "digitalocean", digitalocean_host_name)
+  # end
 end
