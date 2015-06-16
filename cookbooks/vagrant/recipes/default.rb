@@ -5,7 +5,6 @@ SOURCE_DIR = "#{HOME}/pyenv/src"
 CKAN_DIR = "#{SOURCE_DIR}/ckan"
 VAGRANT_DIR = "/vagrant"
 PROVIDER = node[:provider]
-RUN_TESTS = false
 RUN_HARVESTER = false
 
 bash "set default locale to UTF-8" do
@@ -112,7 +111,7 @@ dest = "/etc/solr/conf/"
 ].each do |file|
   link dest + file do
     to src + file
-    notifies :restart, "service[jetty]"
+    notifies :restart, "service[jetty]", :immediately
   end
 end
 
@@ -224,7 +223,7 @@ end
 
 bash "setup postgres db for ckan" do
   user "postgres"
-  not_if "sudo -u postgres psql -c '\\l' | grep ckan_default"
+  not_if "psql -l | grep ckan_default", :user => 'postgres'
   code <<-EOH
 createuser -S -D -R ckan_default
 psql -c "ALTER USER ckan_default with password 'pass'"
@@ -238,30 +237,6 @@ bash "install the ckan pip dev dependencies" do
 source #{HOME}/pyenv/bin/activate
 pip install -r #{CKAN_DIR}/dev-requirements.txt
 EOH
-end
-
-if RUN_TESTS then
-  execute "setup ckan test db" do
-    user "postgres"
-    not_if "sudo -u postgres psql -c '\\l' | grep ckan_test"
-    command "createdb -O ckan_default ckan_test -E utf-8"
-  end
-  
-  execute "setup datastore test db" do
-    user "postgres"
-    not_if "sudo -u postgres psql -c '\\l' | grep datastore_test"
-    command "createdb -O ckan_default datastore_test -E utf-8"
-  end
-  
-  bash "reset/populate the test db" do
-    not_if "psql -c '\\dt' ckan_test | grep resource_revision", :user => "postgres"
-    user USER
-    cwd CKAN_DIR
-    code <<-EOH
-  source #{HOME}/pyenv/bin/activate
-  nosetests --ckan --reset-db --with-pylons=test-core.ini ckan
-  EOH
-  end
 end
 
 service "rabbitmq-server" do
