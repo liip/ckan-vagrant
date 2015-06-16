@@ -5,7 +5,6 @@ SOURCE_DIR = "#{HOME}/pyenv/src"
 CKAN_DIR = "#{SOURCE_DIR}/ckan"
 VAGRANT_DIR = "/vagrant"
 PROVIDER = node[:provider]
-RUN_TESTS = false
 RUN_HARVESTER = false
 
 bash "set default locale to UTF-8" do
