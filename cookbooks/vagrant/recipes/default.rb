@@ -308,6 +308,9 @@ end
       if test -e pip-requirements.txt; then
           pip install -r pip-requirements.txt
       fi
+      if test -e requirements.txt; then
+          pip install -r requirements.txt
+      fi
       EOH
     end
 end
