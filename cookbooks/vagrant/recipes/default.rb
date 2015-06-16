@@ -82,7 +82,7 @@ bash "clone ckan" do
   group USER
   not_if "test -f #{CKAN_DIR}/README.rst"
   code <<-EOH
-  git clone #{REPOSITORY} -b release-v2.2 #{CKAN_DIR}
+  git clone #{REPOSITORY} -b ckan-2.3 #{CKAN_DIR}
   cd #{CKAN_DIR}
   git submodule update --init
 EOH
@@ -358,16 +358,6 @@ bash "creating a harvest user" do
   source #{HOME}/pyenv/bin/activate
   paster --plugin=ckan user add harvest email=harvest@email.org password=pass -c development.ini
   paster --plugin=ckan sysadmin add harvest -c development.ini
-  EOH
-end
-
-bash "monkey patching recline_preview" do
-  user USER
-  cwd CKAN_DIR
-  code <<-EOH
-  mkdir -p /home/vagrant/pyenv/lib/python2.7/site-packages/ckanext/reclinepreview/theme/templates
-  mkdir -p /home/vagrant/pyenv/lib/python2.7/site-packages/ckanext/reclinepreview/theme/public
-  cp -r #{CKAN_DIR}/ckanext/reclinepreview/theme /home/vagrant/pyenv/lib/python2.7/site-packages/ckanext/reclinepreview/
   EOH
 end
 
