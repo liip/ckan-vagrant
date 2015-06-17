@@ -82,8 +82,9 @@ bash "clone ckan" do
   group USER
   not_if "test -f #{CKAN_DIR}/README.rst"
   code <<-EOH
-  git clone #{REPOSITORY} -b ckan-2.3 #{CKAN_DIR}
+  git clone #{REPOSITORY} #{CKAN_DIR}
   cd #{CKAN_DIR}
+  git checkout tags/ckan-2.3
   git submodule update --init
 EOH
 end
