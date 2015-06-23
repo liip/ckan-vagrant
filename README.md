@@ -1,6 +1,6 @@
 # Vagrant CKAN development environment
 
-CKAN Version: 2.2
+CKAN Version: 2.3
 
 ## Requirements
 
